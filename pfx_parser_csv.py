@@ -43,7 +43,7 @@ end_day = int(str(end_date)[-2:])
 enddate = datetime.date(end_year, end_month, end_day)
 year = str(start_year)
 
-prefix = start_date + '_' + end_date + '_'
+prefix = str(start_date) + '_' + str(end_date) + '_'
 
 #setting import folder to store CSV files for future processing and archiving
 pitchfile = "import/" + prefix + "pitches.csv"
