@@ -9,6 +9,7 @@ Added Import Routine - importcsv.py (for importing CSV result files into MySQL D
 
 TODO: 
 Will add in logging to DB/Files
+
 Daily Pull Process
 
 
