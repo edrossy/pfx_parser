@@ -24,6 +24,7 @@ import io
 import time
 import importcsv as icsv
 
+#Updated section to make it easy to get CSV files by year or by specific date range
 try:
     start_date = int(input("Starting Date (YYYYMMDD): "))
 except:
@@ -42,8 +43,11 @@ end_day = int(str(end_date)[-2:])
 enddate = datetime.date(end_year, end_month, end_day)
 year = str(start_year)
 
-pitchfile = "import/" + year + "_pitches.csv"
-atbatfile = "import/" + year + "_atbats.csv"
+prefix = start_date + '_' + end_date + '_'
+
+#setting import folder to store CSV files for future processing and archiving
+pitchfile = "import/" + prefix + "pitches.csv"
+atbatfile = "import/" + prefix + "atbats.csv"
 
 pitch_outfile = open(pitchfile, "a+")
 atbat_outfile = open(atbatfile, "a+")
@@ -1039,33 +1043,3 @@ for i in range(delta.days + 1):
                                 start_bases_cd) + "," + str(end_bases_cd) + "\n")
                         bottom_outs += int(event_outs_ct)
     prior_d_url = d_url
-
-
-#with open(atbatfile,'r') as in_file, open('import/'+year+'_atbats.csv','w+') as out_file:
-#    seen = set()
-#    for line in in_file:
-#        if line in seen: continue
-
-#        seen.add(line)
-#        out_file.write(line)
-
-#with open(pitchfile,'r') as in_file, open('import/'+year+'_pitches.csv','w+') as out_file:
-#    seen = set()
-#    for line in in_file:
-#        if line in seen: continue
-
-#        seen.add(line)
-#        out_file.write(line)
-
-tfolder = "import/"
-chunksize = 50000
-delimiter = ","
-textqualifier = '"'
-rowlimit = 1000000
-sametable = "No"
-appendtable = "appendtable"
-year = year + '_'
-
-constring = 'mysql+mysqldb://sqluser:sqlpassword@127.0.0.1:3306/pitchfx'
-
-icsv.importfile(constring,tfolder,textqualifier,delimiter,chunksize,sametable,appendtable,year)
