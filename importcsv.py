@@ -60,7 +60,7 @@ def importfile(prefix):
 
                 modes = {zipfile.ZIP_DEFLATED: 'deflated', zipfile.ZIP_STORED: 'stored', }
                 print ((str(datetime.datetime.now()) + ' ;Archiving File: ' + tfile))
-                zf = zipfile.ZipFile(tfile + '.zip', mode='w')
+                zf = zipfile.ZipFile(tfile.replace('.csv','') + '.zip', mode='w')
                 try:
                     print ((str(datetime.datetime.now()) + ' ;Archiving File: ' + tfile + ' with compression mode',
                             modes[compression]))
