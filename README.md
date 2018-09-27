@@ -13,6 +13,6 @@ TODO:
 
 - Daily Updates To DB
 
-- If there is an issue with reading game.xml for data and it returns Unknown, there needs to be better error handling to retry xml pull and parsing of the data.  Alternatively, you query database for bad value and requery the api for that particular day and removing that day's data from the database
+- If there is an issue with reading game.xml for data and it returns Unknown, there needs to be better error handling to retry xml pull and parsing of the data.  Alternatively, you can query database for bad values and requery the api for days with bad data after removing the bad data from the database.
 
 
