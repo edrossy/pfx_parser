@@ -98,7 +98,7 @@ for i in range(delta.days + 1):
             playoff_fl = "F"
             #print (g_url)
             if BeautifulSoup(urlopen(g_url), features="lxml").find("a", href="game.xml"):
-                #				time.sleep(1)
+                time.sleep(.500)
                 detail_soup = BeautifulSoup(urlopen(g_url + "game.xml"), features="lxml")
                 if 'type' in detail_soup.game.attrs:
                     game_type = detail_soup.game["type"]
@@ -1043,3 +1043,6 @@ for i in range(delta.days + 1):
                                 start_bases_cd) + "," + str(end_bases_cd) + "\n")
                         bottom_outs += int(event_outs_ct)
     prior_d_url = d_url
+
+#Import atbats and pitches csv files to MySQL Database: Note Tables (pitchfx.pitches & pitchfx.atbats) in MySQL DB must already be created - see SQL Scripts
+icsv.importfile(prefix)
