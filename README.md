@@ -7,9 +7,10 @@ SQL Tables Defs Updated for MySQL
 
 Added Import Routine - importcsv.py (for importing CSV result files into MySQL DB)
 
-TODO: 
-Will add in logging to DB/Files
+TODO:
 
-Daily Pull Process
+- Add in logging to DB/Files
+
+- Daily Updates To DB
 
 
