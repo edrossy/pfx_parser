@@ -23,6 +23,7 @@ import datetime
 import io
 import time
 import importcsv as icsv
+import logging.config
 
 #Updated section to make it easy to get CSV files by year or by specific date range
 try:
@@ -52,16 +53,32 @@ atbatfile = "import/" + prefix + "atbats.csv"
 pitch_outfile = open(pitchfile, "a+")
 atbat_outfile = open(atbatfile, "a+")
 
+logfile =  ('parselog_').upper() + str(time.strftime('%Y%m%d')) + '.log'
+logging.basicConfig(level=logging.INFO,
+					format='%(asctime)s.%(msecs)03d|%(levelname)s|{%(module)s}%(message)s',
+					datefmt='%Y-%m-%d,%H:%M:%S',
+					filename=logfile,
+					filemode='a')
+# define a Handler which writes INFO messages or higher to the sys.stderr
+console = logging.StreamHandler()
+console.setLevel(logging.INFO)
+# set a format which is simpler for console use
+formatter = logging.Formatter('%(name)-12s|%(levelname)-8s %(message)s')
+# tell the handler to use this format
+console.setFormatter(formatter)
+# add the handler to the root logger
+logging.getLogger('').addHandler(console)
+
 add_pitch = ("INSERT INTO pythonpfx.pitches "
-             "(retro_game_id, st_fl, regseason_fl, playoffs_fl, game_type, game_type_des, game_id, home_team_id, home_team_lg, away_team_id, away_team_lg,interleague_fl, bat_home_id, park_id, park_name, park_loc, pit_id, bat_id, pit_hand_cd, bat_hand_cd, pa_ball_ct, pa_strike_ct, outs_ct, pitch_seq, pa_terminal_fl, pa_event_cd, start_bases_cd, end_bases_cd, event_outs_ct, ab_number, pitch_res, pitch_des, pitch_id, x, y, start_speed, end_speed, sz_top, sz_bot, pfx_x, pfx_z, px, py, pz, x0, y0, z0, vx0, vy0, vz0, ax, ay, az, break_y, break_angle, break_length, pitch_type, type_conf, zone, spin_dir, spin_rate, sv_id)"
-             "VALUES (%(retro_game_id)s, %(st_fl)s, %(regseason_fl)s, %(playoffs_fl)s, %(game_type)s, %(game_type_des)s, %(game_id)s, %(home_team_id)s, %(home_team_lg)s, %(away_team_id)s, %(away_team_lg)s,%(interleague_fl)s, %(bat_home_id)s, %(park_id)s, %(park_name)s, %(park_loc)s, %(pit_id)s, %(bat_id)s, %(pit_hand_cd)s, %(bat_hand_cd)s, %(pa_ball_ct)s, %(pa_strike_ct)s, %(outs_ct)s, %(pitch_seq)s, %(pa_terminal_fl)s, %(pa_event_cd)s, %(start_bases_cd)s, %(end_bases_cd)s, %(event_outs_ct)s, %(ab_number)s, %(pitch_res)s, %(pitch_des)s, %(pitch_id)s, %(x)s, %(y)s, %(start_speed)s, %(end_speed)s, %(sz_top)s, %(sz_bot)s, %(pfx_x)s, %(pfx_z)s, %(px)s, %(py)s, %(pz)s, %(x0)s, %(y0)s, %(z0)s, %(vx0)s, %(vy0)s, %(vz0)s, %(ax)s, %(ay)s, %(az)s, %(break_y)s, %(break_angle)s, %(break_length)s, %(pitch_type)s, %(type_conf)s, %(zone)s, %(spin_dir)s, %(spin_rate)s, %(sv_id)s)")
+             "(retro_game_id, id, st_fl, regseason_fl, playoffs_fl, game_type, game_type_des, game_id, home_team_id, home_team_lg, away_team_id, away_team_lg,interleague_fl, bat_home_id, park_id, park_name, park_loc, pit_id, bat_id, pit_hand_cd, bat_hand_cd, pa_ball_ct, pa_strike_ct, outs_ct, pitch_seq, pa_terminal_fl, pa_event_cd, start_bases_cd, end_bases_cd, event_outs_ct, ab_number, pitch_res, pitch_des, pitch_id, x, y, start_speed, end_speed, sz_top, sz_bot, pfx_x, pfx_z, px, py, pz, x0, y0, z0, vx0, vy0, vz0, ax, ay, az, break_y, break_angle, break_length, pitch_type, type_conf, zone, spin_dir, spin_rate, sv_id)"
+             "VALUES (%(retro_game_id)s, %(id)s, %(st_fl)s, %(regseason_fl)s, %(playoffs_fl)s, %(game_type)s, %(game_type_des)s, %(game_id)s, %(home_team_id)s, %(home_team_lg)s, %(away_team_id)s, %(away_team_lg)s,%(interleague_fl)s, %(bat_home_id)s, %(park_id)s, %(park_name)s, %(park_loc)s, %(pit_id)s, %(bat_id)s, %(pit_hand_cd)s, %(bat_hand_cd)s, %(pa_ball_ct)s, %(pa_strike_ct)s, %(outs_ct)s, %(pitch_seq)s, %(pa_terminal_fl)s, %(pa_event_cd)s, %(start_bases_cd)s, %(end_bases_cd)s, %(event_outs_ct)s, %(ab_number)s, %(pitch_res)s, %(pitch_des)s, %(pitch_id)s, %(x)s, %(y)s, %(start_speed)s, %(end_speed)s, %(sz_top)s, %(sz_bot)s, %(pfx_x)s, %(pfx_z)s, %(px)s, %(py)s, %(pz)s, %(x0)s, %(y0)s, %(z0)s, %(vx0)s, %(vy0)s, %(vz0)s, %(ax)s, %(ay)s, %(az)s, %(break_y)s, %(break_angle)s, %(break_length)s, %(pitch_type)s, %(type_conf)s, %(zone)s, %(spin_dir)s, %(spin_rate)s, %(sv_id)s)")
 
 if os.stat(pitchfile).st_size == 0:
     pitch_outfile.write(
-        "retro_game_id,year,st_fl,regseason_fl,playoffs_fl,game_type,game_type_des,game_id,home_team_id,home_team_lg,away_team_id,away_team_lg,interleague_fl,inning,bat_home_id,park_id,park_name,park_loc,pit_id,bat_id,pit_hand_cd,bat_hand_cd,pa_ball_ct,pa_strike_ct,outs_ct,pitch_seq,pa_terminal_fl,pa_event_cd,start_bases_cd,end_bases_cd,event_outs_ct,ab_number,pitch_res,pitch_des,pitch_id,x,y,start_speed,end_speed,sz_top,sz_bot,pfx_x,pfx_z,px,pz,x0,y0,z0,vx0,vy0,vz0,ax,ay,az,break_y,break_angle,break_length,pitch_type,pitch_type_seq,type_conf,zone,spin_dir,spin_rate,sv_id\n")
+        "retro_game_id,id,year,st_fl,regseason_fl,playoffs_fl,game_type,game_type_des,game_id,home_team_id,home_team_lg,away_team_id,away_team_lg,interleague_fl,inning,bat_home_id,park_id,park_name,park_loc,pit_id,bat_id,pit_hand_cd,bat_hand_cd,pa_ball_ct,pa_strike_ct,outs_ct,pitch_seq,pa_terminal_fl,pa_event_cd,start_bases_cd,end_bases_cd,event_outs_ct,ab_number,pitch_res,pitch_des,pitch_id,x,y,start_speed,end_speed,sz_top,sz_bot,pfx_x,pfx_z,px,pz,x0,y0,z0,vx0,vy0,vz0,ax,ay,az,break_y,break_angle,break_length,pitch_type,pitch_type_seq,type_conf,zone,spin_dir,spin_rate,sv_id\n")
 if os.stat(atbatfile).st_size == 0:
     atbat_outfile.write(
-        "retro_game_id,year,month,day,st_fl,regseason_fl,playoff_fl,game_type,game_type_des,local_game_time,game_id,home_team_id,away_team_id,home_team_lg,away_team_lg,interleague_fl,park_id,park_name,park_location,inning_number,bat_home_id,inn_outs,ab_number,pit_mlbid,pit_hand_cd,bat_mlbid,bat_hand_cd,ball_ct,strike_ct,pitch_seq,pitch_type_seq,event_outs_ct,ab_des,event_tx,event_cd,battedball_cd,start_bases_cd,end_bases_cd\n")
+        "retro_game_id,id,year,month,day,st_fl,regseason_fl,playoff_fl,game_type,game_type_des,local_game_time,game_id,home_team_id,away_team_id,home_team_lg,away_team_lg,interleague_fl,park_id,park_name,park_location,inning_number,bat_home_id,inn_outs,ab_number,pit_mlbid,pit_hand_cd,bat_mlbid,bat_hand_cd,ball_ct,strike_ct,pitch_seq,pitch_type_seq,event_outs_ct,ab_des,event_tx,event_cd,battedball_cd,start_bases_cd,end_bases_cd\n")
 
 base_url = "http://gd2.mlb.com/components/game/mlb/"
 
@@ -70,7 +87,7 @@ prior_d_url = ""
 
 for i in range(delta.days + 1):
     active_date = (startdate + datetime.timedelta(days=i))
-    print(base_url + "year_" + str((startdate + datetime.timedelta(days=i)).year) + "/month_" + active_date.strftime(
+    logging.info(base_url + "year_" + str((startdate + datetime.timedelta(days=i)).year) + "/month_" + active_date.strftime(
         '%m') + "/day_" + active_date.strftime('%d'))
     try:
         urlopen(
@@ -80,7 +97,8 @@ for i in range(delta.days + 1):
             (startdate + datetime.timedelta(days=i)).year) + "/month_" + active_date.strftime(
             '%m') + "/day_" + active_date.strftime('%d')
     except:
-        print("excepted")
+        logging.info( "Exception: " + base_url + "year_" + str((startdate + datetime.timedelta(days=i)).year) + "/month_" + active_date.strftime(
+                '%m') + "/day_" + active_date.strftime('%d'))
         d_url = prior_d_url
     if d_url != prior_d_url:
         day_soup = BeautifulSoup(urlopen(d_url), features="lxml")
@@ -92,13 +110,13 @@ for i in range(delta.days + 1):
             else:
                 game_number = 1
             g_url = d_url + "/" + g
-            print(g)
+            logging.info(g)
             st_fl = "F"
             regseason_fl = "F"
             playoff_fl = "F"
             #print (g_url)
             if BeautifulSoup(urlopen(g_url), features="lxml").find("a", href="game.xml"):
-                time.sleep(.500)
+                #time.sleep(.500)
                 detail_soup = BeautifulSoup(urlopen(g_url + "game.xml"), features="lxml")
                 if 'type' in detail_soup.game.attrs:
                     game_type = detail_soup.game["type"]
@@ -106,6 +124,9 @@ for i in range(delta.days + 1):
                     game_type = "U"
                 if game_type == "S":
                     game_type_des = "Spring Training"
+                    st_fl = "T"
+                elif game_type == "E":
+                    game_type_des = "Exhibition"
                     st_fl = "T"
                 elif game_type == "R":
                     game_type_des = "Regular Season"
@@ -122,8 +143,12 @@ for i in range(delta.days + 1):
                 elif game_type == "W":
                     game_type_des = "World Series"
                     playoff_fl = "T"
+                elif game_type == "A":
+                    game_type_des = "Amatuer"
+                    st_fl = "T"
                 else:
                     game_type_des = "Unknown"
+                    logging.info(g_url + "game.xml |ERROR: Please Retry To Get Data - 152")
                 if 'local_game_time' in detail_soup.game.attrs:
                     local_game_time = detail_soup.game["local_game_time"]
                 else:
@@ -131,17 +156,88 @@ for i in range(delta.days + 1):
                 if 'game_pk' in detail_soup.game.attrs:
                     game_id = detail_soup.game["game_pk"]
                 else:
-                    game_id = "unknown"
+                    game_id = 'unknown'
                 if detail_soup.find("team"):
                     home_team_id = detail_soup.find("team", type="home")["code"]
                     away_team_id = detail_soup.find("team", type="away")["code"]
                     home_team_lg = detail_soup.find("team", type="home")["league"]
                     away_team_lg = detail_soup.find("team", type="away")["league"]
                 else:
-                    home_team_id = "unknown"
-                    away_team_id = "unknown"
-                    home_team_lg = "unknown"
-                    away_team_lg = "unknown"
+                    if BeautifulSoup(urlopen(g_url), features="lxml").find("a", href="linescore.xml"):
+                        detail_soup4 = BeautifulSoup(urlopen(g_url + "linescore.xml"), features="lxml")
+                        home_team_id = detail_soup4.find("game")["home_code"]
+                        away_team_id = detail_soup4.find("game")["away_code"]
+                        home_team_lg = detail_soup4.find("game")["home_league_id"]
+                        away_team_lg = detail_soup4.find("game")["away_league_id"]
+                    else:
+                        home_team_id = "unknown"
+                        away_team_id = "unknown"
+                if away_team_lg == '103':
+                    away_team_lg == 'AL'
+                elif away_team_lg == '104':
+                    away_team_lg == 'NL'
+                elif away_team_lg == '160':
+                    away_team_lg = 'WBC'
+                elif away_team_lg == '111':
+                    away_team_lg = 'SOU'
+                elif away_team_lg == '112':
+                    away_team_lg = 'PCL'
+                elif away_team_lg == '125':
+                    away_team_lg = 'MEX'
+                elif away_team_lg == '534':
+                    away_team_lg = 'INT'
+                elif away_team_lg == '523':
+                    away_team_lg = 'I18'
+                elif away_team_lg == '378':
+                    away_team_lg = 'FUT'
+                elif away_team_lg == '509':
+                    away_team_lg = 'FSL'
+                elif away_team_lg == '110':
+                    away_team_lg = 'CAL'
+                elif away_team_lg == '107':
+                    away_team_lg = 'BE'
+                elif away_team_lg == '108':
+                    away_team_lg = 'ACC'
+                elif away_team_id == 'uft':
+                    away_team_lg = 'UFT'
+                    home_team_lg = 'UFT'
+                elif away_team_id == 'wft':
+                    away_team_lg = 'UFT'
+                    home_team_lg = 'UFT'
+                if home_team_lg == '103':
+                    home_team_lg == 'AL'
+                elif home_team_lg == '104':
+                    home_team_lg == 'NL'
+                elif home_team_lg == '160':
+                    home_team_lg = 'WBC'
+                elif home_team_lg == '111':
+                    home_team_lg = 'SOU'
+                elif home_team_lg == '112':
+                    home_team_lg = 'PCL'
+                elif home_team_lg == '125':
+                    home_team_lg = 'MEX'
+                elif home_team_lg == '534':
+                    home_team_lg = 'INT'
+                elif home_team_lg == '523':
+                    home_team_lg = 'I18'
+                elif home_team_lg == '378':
+                    home_team_lg = 'FUT'
+                elif home_team_lg == '509':
+                    home_team_lg = 'FSL'
+                elif home_team_lg == '110':
+                    home_team_lg = 'CAL'
+                elif home_team_lg == '107':
+                    home_team_lg = 'BE'
+                elif away_team_id == 'fls':
+                    away_team_lg = 'ACC'
+                elif away_team_id == 'umw':
+                    away_team_lg = 'CAC'
+                elif away_team_id == 'mac':
+                    away_team_lg = 'UMAC'
+                elif away_team_id == 'slb':
+                    away_team_lg = 'PCL'
+                elif home_team_lg == '108':
+                    home_team_lg = 'ACC'
                 if home_team_lg == away_team_lg:
                     interleague_fl = "F"
                 else:
@@ -151,10 +247,28 @@ for i in range(delta.days + 1):
                     park_name = detail_soup.stadium["name"]
                     park_loc = detail_soup.stadium["location"]
                 else:
-                    park_id = "unknown"
-                    park_name = "unknown"
-                    park_loc = "unknown"
+                    if BeautifulSoup(urlopen(g_url), features="lxml").find("a", href="gameday_Syn.xml"):
+                        detail_soup3 = BeautifulSoup(urlopen(g_url + "gameday_Syn.xml"), features="lxml")
+                        if detail_soup3.find("stadium"):
+                            park_id = detail_soup3.stadium["id"]
+                            park_name = detail_soup3.stadium["name"]
+                            park_loc = detail_soup3.stadium["location"]
+                    else:
+                        park_id = "unknown"
+                        park_name = "unknown"
+                        park_loc = "unknown"
+                if BeautifulSoup(urlopen(g_url), features="lxml").find("a", href="gameday_Syn.xml"):
+                    detail_soup2 = BeautifulSoup(urlopen(g_url + "gameday_Syn.xml"), features="lxml")
+                    if detail_soup2.game["id"]:
+                        id = detail_soup2.game["id"].replace('/', '')
+                    else:
+                        id = 'unknown'
+                    if game_id == 'unknown':
+                        game_id = detail_soup2.game["idpk"]
+                    else:
+                        game_id = 'unknown'
             else:
+                logging.info(g_url + "game.xml |ERROR: Please Retry To Get Data - 272")
                 st_fl = "U"
                 regseason_fl = "U"
                 playoff_fl = "U"
@@ -179,7 +293,7 @@ for i in range(delta.days + 1):
             except:
                 continue
             for inning in BeautifulSoup(urlopen(tested_inn_url),features="lxml").find_all("a", href=re.compile("inning_\d*.xml")):
-                inn_soup = BeautifulSoup(urlopen(inn_url + inning.get_text().strip()), "xml")
+                inn_soup = BeautifulSoup(urlopen(inn_url + inning.get_text().strip()), features="lxml")
                 inning_number = inn_soup.inning["num"]
                 top_outs = 0
                 bottom_outs = 0
@@ -570,7 +684,7 @@ for i in range(delta.days + 1):
                             else:
                                 spin_rate = ""
                             pitch_outfile.write(
-                                str(retro_game_id) + "," + str(active_date.year) + "," + str(st_fl) + "," + str(
+                                str(retro_game_id) + "," + str(id) + "," + str(active_date.year) + "," + str(st_fl) + "," + str(
                                     regseason_fl) + "," + str(playoff_fl) + "," + str(game_type) + "," + str(
                                     game_type_des) + "," + str(game_id) + "," + str(home_team_id) + "," + str(
                                     home_team_lg) + "," + str(away_team_id) + "," + str(away_team_lg) + "," + str(
@@ -599,7 +713,7 @@ for i in range(delta.days + 1):
                                 if strike_tally < 2:
                                     strike_tally += 1
                         atbat_outfile.write(
-                            str(retro_game_id) + "," + str(active_date.year) + "," + str(active_date.month) + "," + str(
+                            str(retro_game_id) + "," + str(id) + "," + str(active_date.year) + "," + str(active_date.month) + "," + str(
                                 active_date.day) + "," + str(st_fl) + "," + str(regseason_fl) + "," + str(
                                 playoff_fl) + "," + str(game_type) + "," + str(game_type_des) + "," + str(
                                 local_game_time) + "," + str(game_id) + "," + str(home_team_id) + "," + str(
@@ -999,7 +1113,7 @@ for i in range(delta.days + 1):
                             else:
                                 spin_rate = ""
                             pitch_outfile.write(
-                                str(retro_game_id) + "," + str(active_date.year) + "," + str(st_fl) + "," + str(
+                                str(retro_game_id) + "," + str(id) + "," + str(active_date.year) + "," + str(st_fl) + "," + str(
                                     regseason_fl) + "," + str(playoff_fl) + "," + str(game_type) + "," + str(
                                     game_type_des) + "," + str(game_id) + "," + str(home_team_id) + "," + str(
                                     home_team_lg) + "," + str(away_team_id) + "," + str(away_team_lg) + "," + str(
@@ -1028,7 +1142,7 @@ for i in range(delta.days + 1):
                                 if strike_tally < 2:
                                     strike_tally += 1
                         atbat_outfile.write(
-                            str(retro_game_id) + "," + str(active_date.year) + "," + str(active_date.month) + "," + str(
+                            str(retro_game_id) + "," + str(id) + "," + str(active_date.year) + "," + str(active_date.month) + "," + str(
                                 active_date.day) + "," + str(st_fl) + "," + str(regseason_fl) + "," + str(
                                 playoff_fl) + "," + str(game_type) + "," + str(game_type_des) + "," + str(
                                 local_game_time) + "," + str(game_id) + "," + str(home_team_id) + "," + str(
@@ -1042,7 +1156,6 @@ for i in range(delta.days + 1):
                                 event_tx) + "," + str(event_cd) + "," + str(battedball_cd) + "," + str(
                                 start_bases_cd) + "," + str(end_bases_cd) + "\n")
                         bottom_outs += int(event_outs_ct)
-    prior_d_url = d_url
-
+        prior_d_url = d_url
 #Import atbats and pitches csv files to MySQL Database: Note Tables (pitchfx.pitches & pitchfx.atbats) in MySQL DB must already be created - see SQL Scripts
 icsv.importfile(prefix)
