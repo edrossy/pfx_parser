@@ -9,16 +9,10 @@ Added Import Routine - importcsv.py (for importing CSV result files into MySQL D
 
 TODO:
 
-- Add in logging to DB/Files
+- Add in logging to DB/Files - DONE
 
-- Daily Updates To DB
+- Daily Updates To DB - SUPPORTED
 
-- If there is an issue with reading game.xml for data and it returns Unknown, there needs to be better error handling to retry xml pull and parsing of the data.  Alternatively, you can query database (
-
-#Select  distinct year,month,day from atbats where retro_game_id like 'UNKNOWN%';
-
-#delete from atbats where retro_game_id like 'UNKNOWN%';
-
-) for bad values and requery the api for days with bad data after removing the bad data from the database.
+- Fixes put in place deal with issues reading attributes/values from game.xml or alternative xml, there needs to be better error handling to pinpoint issue and update the code - WORK IN PROGRESS
 
 
